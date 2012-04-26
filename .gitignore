@@ -1,2 +1,6 @@
 target/
-
+project/target
+core/target
+sample/target
+*.class
+*.swp
