@@ -3,7 +3,14 @@ import sbt._,Keys._
 object build extends Build{
 
   lazy val buildSettings = Defaults.defaultSettings ++ Seq(
-    javacOptions ++= Seq("-Xlint")
+    javacOptions ++= Seq("-Xlint"),
+    autoScalaLibrary := false,
+    libraryDependencies ++= Seq(
+      "org.projectlombok" % "lombok" % "0.11.0"
+    ),
+    shellPrompt in ThisBuild := { state =>
+      Project.extract(state).currentRef.project + "> "
+    }
   )
 
   lazy val root = Project(
