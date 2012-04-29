@@ -765,7 +765,7 @@ public class InterfaceProcessor extends AbstractProcessor {
         String safeName = prefix + toSafeName(property.getName());
         if(isPrimitive(property.getType())) return safeName;
 
-        RetainType type = RetainType.valueOf(property.getRetainType());
+        RetainCode type = RetainType.valueOf(property.getRetainType());
         return type.codeFor(safeName, property);
     }
 
