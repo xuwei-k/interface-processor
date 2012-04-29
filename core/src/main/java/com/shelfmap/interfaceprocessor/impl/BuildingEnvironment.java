@@ -18,7 +18,8 @@ package com.shelfmap.interfaceprocessor.impl;
 import com.shelfmap.interfaceprocessor.Environment;
 import com.shelfmap.interfaceprocessor.InterfaceDefinition;
 import javax.annotation.processing.ProcessingEnvironment;
-
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
@@ -26,32 +27,12 @@ import javax.annotation.processing.ProcessingEnvironment;
  */
 public class BuildingEnvironment implements Environment {
 
-    private final ProcessingEnvironment p;
-    private final InterfaceDefinition def;
-    private int level = 0;
+    @Getter private final ProcessingEnvironment processingEnvironment;
+    @Getter private final InterfaceDefinition interfaceDefinition;
+    @Getter @Setter private int level = 0;
 
     public BuildingEnvironment(ProcessingEnvironment p, InterfaceDefinition def) {
-        this.p = p;
-        this.def = def;
-    }
-
-    @Override
-    public ProcessingEnvironment getProcessingEnvironment() {
-        return p;
-    }
-
-    @Override
-    public InterfaceDefinition getInterfaceDefinition() {
-        return def;
-    }
-
-    @Override
-    public int getLevel() {
-        return level;
-    }
-
-    @Override
-    public void setLevel(int level) {
-        this.level = level;
+        this.processingEnvironment = p;
+        this.interfaceDefinition = def;
     }
 }

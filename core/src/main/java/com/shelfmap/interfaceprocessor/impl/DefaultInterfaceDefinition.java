@@ -25,6 +25,9 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
+import lombok.val;
+import lombok.Setter;
+import lombok.Getter;
 
 /**
  *
@@ -32,7 +35,7 @@ import javax.lang.model.util.Types;
  */
 public class DefaultInterfaceDefinition implements InterfaceDefinition {
     private String pkg;
-    private String interfaceName;
+    @Getter @Setter private String interfaceName;
     private final List<Property> properties = new ArrayList<Property>();
     private final List<ExecutableElement> methods = new ArrayList<ExecutableElement>();
     private final List<TypeParameterElement> typeParameters = new ArrayList<TypeParameterElement>();
@@ -52,16 +55,6 @@ public class DefaultInterfaceDefinition implements InterfaceDefinition {
     }
 
     @Override
-    public String getInterfaceName() {
-        return this.interfaceName;
-    }
-
-    @Override
-    public void setInterfaceName(String interfaceName) {
-        this.interfaceName = interfaceName;
-    }
-
-    @Override
     public Collection<Property> getProperties() {
         return new ArrayList<Property>(properties);
     }
@@ -74,7 +67,7 @@ public class DefaultInterfaceDefinition implements InterfaceDefinition {
 
     @Override
     public Property findProperty(String name, TypeMirror type, Types types) {
-        for (Property prop : properties) {
+        for (val prop : properties) {
             if(prop.getName().equals(name) && types.isSameType(prop.getType(), type)) {
                 return prop;
             }
@@ -105,7 +98,7 @@ public class DefaultInterfaceDefinition implements InterfaceDefinition {
     }
 
     public boolean isHavingIgnoredProperty() {
-        for (Property property : getProperties()) {
+        for (val property : getProperties()) {
             if(property.isIgnored()) return true;
         }
         return false;

@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import lombok.val;
 
 /**
  *
@@ -74,7 +75,7 @@ public final class Objects {
     }
 
     public static Collection<Class<?>> linearize(Class<?> parentClass) {
-        List<Class<?>> resultList = new ArrayList<Class<?>>();
+        val resultList = new ArrayList<Class<?>>();
         appendAllInterfaces(parentClass, resultList);
 
         Class<?> superClass = parentClass.getSuperclass();
@@ -91,7 +92,7 @@ public final class Objects {
     }
 
     public static <A extends Object & Annotation> A findAnnotation(Class<?> targetClass, Class<A> findingAnnotation) {
-        for (Class<?> clazz : linearize(targetClass)) {
+        for (val clazz : linearize(targetClass)) {
             if (clazz.isAnnotationPresent(findingAnnotation)) {
                 return clazz.getAnnotation(findingAnnotation);
             }
@@ -101,11 +102,11 @@ public final class Objects {
 
     public static <A extends Object & Annotation> A findAnnotationOnProperty(Class<?> targetClass, String propertyName, Class<A> findingAnnotation) throws IntrospectionException {
         CLASS_LOOP:
-        for (Class<?> clazz : linearize(targetClass)) {
-            PropertyDescriptor[] descriptors = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
-            for (PropertyDescriptor descriptor : descriptors) {
+        for (val clazz : linearize(targetClass)) {
+            val descriptors = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
+            for (val descriptor : descriptors) {
                 if (descriptor.getName().equals(propertyName)) {
-                    Method readMethod = descriptor.getReadMethod();
+                    val readMethod = descriptor.getReadMethod();
                     if(readMethod == null) throw new IllegalStateException("the property '" + propertyName + "' does not have a getter method.");
                     A annotation = readMethod.getAnnotation(findingAnnotation);
                     if (annotation != null) {

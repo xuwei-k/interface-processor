@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import lombok.val;
 
 /**
  *
@@ -39,7 +40,7 @@ public final class IO {
             try {
                 target.close();
             } catch (IOException ex) {
-                Logger logger = LoggerFactory.getLogger(loggerOwner);
+                val logger = LoggerFactory.getLogger(loggerOwner);
                 logger.error("Could not close an object.", ex);
             }
         }
@@ -48,8 +49,8 @@ public final class IO {
     private static final int BUFFER_SIZE = 1024;
 
     public static byte[] readBytes(InputStream stream) throws IOException {
-        byte[] bytes = new byte[BUFFER_SIZE];
-        ByteArrayOutputStream output = new ByteArrayOutputStream(BUFFER_SIZE);
+        val bytes = new byte[BUFFER_SIZE];
+        val output = new ByteArrayOutputStream(BUFFER_SIZE);
         try {
             int size = stream.read(bytes);
             while(size >= 0) {

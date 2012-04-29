@@ -6,12 +6,10 @@ package com.shelfmap.interfaceprocessor;
  */
 public enum FieldModifier {
     PRIVATE("private"), DEFAULT(""), PROTECTED("protected");
-    
-    private String modifier;
+
+    @lombok.Getter private String modifier;
 
     private FieldModifier(String modifier) {
         this.modifier = modifier;
     }
-    
-    public String getModifier() { return this.modifier; }
 }

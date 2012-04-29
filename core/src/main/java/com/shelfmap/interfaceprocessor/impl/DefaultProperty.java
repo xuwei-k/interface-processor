@@ -18,6 +18,8 @@ package com.shelfmap.interfaceprocessor.impl;
 import com.shelfmap.interfaceprocessor.Property;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.TypeMirror;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
@@ -27,13 +29,13 @@ public class DefaultProperty implements Property {
 
     private boolean writable;
     private boolean readable;
-    private final String name;
-    private final TypeMirror type;
-    private String retainType = "HOLD";
-    private TypeMirror realType;
+    @Getter private final String name;
+    @Getter private final TypeMirror type;
+    @Getter @Setter private String retainType = "HOLD";
+    @Getter @Setter private TypeMirror realType;
     private boolean ignore;
-    private ExecutableElement reader;
-    private ExecutableElement writer;
+    @Getter private ExecutableElement reader;
+    @Getter private ExecutableElement writer;
 
     public DefaultProperty(String name, TypeMirror type, ExecutableElement reader, ExecutableElement writer) {
         this.name = name;
@@ -55,36 +57,6 @@ public class DefaultProperty implements Property {
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public TypeMirror getType() {
-        return type;
-    }
-
-    @Override
-    public String getRetainType() {
-        return this.retainType;
-    }
-
-    @Override
-    public void setRetainType(String type) {
-        this.retainType = type;
-    }
-
-    @Override
-    public TypeMirror getRealType() {
-        return this.realType;
-    }
-
-    @Override
-    public void setRealType(TypeMirror type) {
-        this.realType = type;
-    }
-
-    @Override
     public boolean isIgnored() {
         return ignore;
     }
@@ -95,19 +67,9 @@ public class DefaultProperty implements Property {
     }
 
     @Override
-    public ExecutableElement getReader() {
-        return reader;
-    }
-
-    @Override
     public void setReader(ExecutableElement reader) {
         this.reader = reader;
         this.readable = reader != null;
-    }
-
-    @Override
-    public ExecutableElement getWriter() {
-        return writer;
     }
 
     @Override

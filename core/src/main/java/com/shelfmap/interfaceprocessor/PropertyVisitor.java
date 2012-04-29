@@ -30,6 +30,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementScanner6;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import lombok.val;
 
 /**
  *
@@ -58,8 +59,8 @@ public class PropertyVisitor extends ElementScanner6<Void, Environment> {
         if(element.getKind() != ElementKind.INTERFACE) return super.visitType(element, env);
 
         //if the element have some super-interfaces, visit them at first.
-        for (TypeMirror superType : element.getInterfaces()) {
-            Element superInterface = env.getProcessingEnvironment().getTypeUtils().asElement(superType);
+        for (val superType : element.getInterfaces()) {
+            val superInterface = env.getProcessingEnvironment().getTypeUtils().asElement(superType);
             env.setLevel(env.getLevel() + 1);
             if(interfaceFilter.canHandle(superType)) {
                 this.visit(superInterface, env);
@@ -69,8 +70,8 @@ public class PropertyVisitor extends ElementScanner6<Void, Environment> {
 
 
         if(env.getLevel() == 0) {
-            InterfaceDefinition definition = env.getInterfaceDefinition();
-            String[] splited = splitPackageName(element.getQualifiedName().toString());
+            val definition = env.getInterfaceDefinition();
+            val splited = splitPackageName(element.getQualifiedName().toString());
             if(splited == null) {
                 throw new IllegalStateException("the qualified name of the element " + element.toString() + " was a null or an empty string.");
             }
@@ -84,7 +85,7 @@ public class PropertyVisitor extends ElementScanner6<Void, Environment> {
     private String[] splitPackageName(String value) {
         if(value == null) return null;
         if(value.isEmpty()) return null;
-        int lastIndexOfDot = value.lastIndexOf('.');
+        val lastIndexOfDot = value.lastIndexOf('.');
         if(lastIndexOfDot < 0) return new String[]{"", value};
         return new String[]{ value.substring(0, lastIndexOfDot), value.substring(lastIndexOfDot + 1, value.length()) };
     }
@@ -95,17 +96,17 @@ public class PropertyVisitor extends ElementScanner6<Void, Environment> {
         if(ee.getKind() != ElementKind.METHOD) return super.visitExecutable(ee, env);
 
         //this visitor handle methods only in interface.
-        Element enclosing = ee.getEnclosingElement();
+        val enclosing = ee.getEnclosingElement();
         if(enclosing == null || enclosing.getKind() != ElementKind.INTERFACE) return super.visitExecutable(ee, env);
 
-        InterfaceDefinition definition = env.getInterfaceDefinition();
+        val definition = env.getInterfaceDefinition();
 
-        Property property = buildPropertyFromExecutableElement(ee, env.getProcessingEnvironment());
-        Types typeUtils = env.getProcessingEnvironment().getTypeUtils();
+        val property = buildPropertyFromExecutableElement(ee, env.getProcessingEnvironment());
+        val typeUtils = env.getProcessingEnvironment().getTypeUtils();
 
         //if the building of property object is succeed, the ee is a variation of a property (readable or writable)
         if(property != null) {
-            Property prev = definition.findProperty(property.getName(), property.getType(), typeUtils);
+            val prev = definition.findProperty(property.getName(), property.getType(), typeUtils);
 
             //if a property having same name and same type is already added to InterfaceDifinition,
             //we merge their readable and writable attribute into the previously added object.
@@ -133,10 +134,10 @@ public class PropertyVisitor extends ElementScanner6<Void, Environment> {
     }
 
     private Property buildPropertyFromExecutableElement(ExecutableElement ee, ProcessingEnvironment p) {
-        String name = ee.getSimpleName().toString();
+        val name = ee.getSimpleName().toString();
 
-        Types typeUtil = p.getTypeUtils();
-        Elements elementUtil = p.getElementUtils();
+        val typeUtil = p.getTypeUtils();
+        val elementUtil = p.getElementUtils();
 
         Property property = null;
         if(name.startsWith("get") || name.startsWith("set") || name.startsWith("is")) {
@@ -147,9 +148,9 @@ public class PropertyVisitor extends ElementScanner6<Void, Environment> {
                     property = new DefaultProperty(uncapitalize(name.substring(3)), ee.getParameters().get(0).asType(), null, ee);
                 }
             } else if(name.startsWith("is")) {
-                PrimitiveType bool = typeUtil.getPrimitiveType(TypeKind.BOOLEAN);
+                val bool = typeUtil.getPrimitiveType(TypeKind.BOOLEAN);
                 if(typeUtil.isSameType(ee.getReturnType(), bool) ||
-                   typeUtil.isSameType(ee.getReturnType(), typeUtil.boxedClass(bool).asType())) {
+                    typeUtil.isSameType(ee.getReturnType(), typeUtil.boxedClass(bool).asType())) {
 
                     property =  new DefaultProperty(uncapitalize(name.substring(2)), ee.getReturnType(), ee, null);
                 }
@@ -158,36 +159,36 @@ public class PropertyVisitor extends ElementScanner6<Void, Environment> {
             if(property != null) {
                 //if a method have a @Property annotation,
                 //then we record the value of the @Property annotation into a Property object.
-                List<? extends AnnotationMirror> annotations = ee.getAnnotationMirrors();
-                for (AnnotationMirror annotation : annotations) {
+                val annotations = ee.getAnnotationMirrors();
+                for (val annotation : annotations) {
 
                     //is the annotationMirror same with "com.shelfmap.simplequery.annotation.Property" ?
-                    TypeElement propertyAnnotationType = elementUtil.getTypeElement(com.shelfmap.interfaceprocessor.annotation.Property.class.getName());
+                    val propertyAnnotationType = elementUtil.getTypeElement(com.shelfmap.interfaceprocessor.annotation.Property.class.getName());
                     if(typeUtil.isSameType(propertyAnnotationType.asType(), annotation.getAnnotationType())) {
 
                         //check all values through the found annotation
                         //and record the values into a Property instance.
                         //we can not use our loving useful Class<?> object here, because this program run in compile-time (no classloader for loading them!).
                         //so we must record the value as TypeMirror or a simple String object.
-                        Map<? extends ExecutableElement, ? extends AnnotationValue> valueMap = elementUtil.getElementValuesWithDefaults(annotation);
-                        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : valueMap.entrySet()) {
-                            ExecutableElement key = entry.getKey();
-                            AnnotationValue value = entry.getValue();
+                        val valueMap = elementUtil.getElementValuesWithDefaults(annotation);
+                        for (val entry : valueMap.entrySet()) {
+                            val key = entry.getKey();
+                            val value = entry.getValue();
                             if(key.getSimpleName().toString().equals("retainType")) {
                                 //the return value of the method 'retainType' is an enum value RetainType.
                                 //but it is manageable as only a VariableElement, and we can get the name of the enum object from the VariableElement.
                                 //we can resolve the correct enum-value from the String value through the RetainType.valueOf(String) method.
-                                VariableElement type = (VariableElement) value.getValue();
+                                val type = (VariableElement) value.getValue();
                                 property.setRetainType(type.getSimpleName().toString());
                             } else if(key.getSimpleName().toString().equals("realType")) {
                                 //the return value of the method 'realType' is a Class<?> object.
                                 //but in annotation-processing time, all Class<?> is expressed as TypeMirror.
                                 //TypeMirror object contains all information about the Class<?> in source-code level,
                                 //so we can retrieve full-class-name from it when it is needed.
-                                TypeMirror type = (TypeMirror) value.getValue();
+                                val type = (TypeMirror) value.getValue();
                                 property.setRealType(type);
                             } else if(key.getSimpleName().toString().equals("ignore")) {
-                                Boolean ignore = (Boolean) value.getValue();
+                                val ignore = (Boolean) value.getValue();
                                 property.setIgnored(ignore.booleanValue());
                             }
                         }
